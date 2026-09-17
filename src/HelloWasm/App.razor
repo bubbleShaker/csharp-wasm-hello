@@ -1,0 +1,32 @@
+<PageTitle>Hello, C# WebAssembly</PageTitle>
+
+<main class="card">
+    <p class="eyebrow">C# &middot; WebAssembly &middot; GitHub Pages</p>
+    <h1>Hello, World!</h1>
+    <p class="sub">
+        This page has no application JavaScript. The text below was produced by
+        C# code compiled to WebAssembly and executed in your browser.
+    </p>
+
+    <dl class="facts">
+        <dt>Runtime</dt>
+        <dd>@RuntimeInformation.FrameworkDescription</dd>
+
+        <dt>Architecture</dt>
+        <dd>@RuntimeInformation.OSArchitecture</dd>
+
+        <dt>Rendered at (UTC)</dt>
+        <dd>@renderedAt.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+    </dl>
+
+    <button class="btn" @onclick="Increment">
+        Clicked @count @(count == 1 ? "time" : "times")
+    </button>
+</main>
+
+@code {
+    private readonly DateTime renderedAt = DateTime.UtcNow;
+    private int count;
+
+    private void Increment() => count++;
+}

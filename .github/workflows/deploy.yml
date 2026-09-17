@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish
+        run: dotnet publish src/HelloWasm/HelloWasm.csproj -c Release -o dist
+
+      - name: Rewrite base href for project page
+        env:
+          BASE_HREF: /${{ github.event.repository.name }}/
+        run: |
+          sed -i "s|<base href=\"/\" />|<base href=\"$BASE_HREF\" />|" dist/wwwroot/index.html
+          # Fails the job if the rewrite did not land, rather than shipping a broken base.
+          grep -F "<base href=\"$BASE_HREF\" />" dist/wwwroot/index.html
+
+      - name: Add SPA fallback and disable Jekyll
+        run: |
+          cp dist/wwwroot/index.html dist/wwwroot/404.html
+          touch dist/wwwroot/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
