@@ -45,5 +45,13 @@ Two details matter for a Pages *project* site:
 - **`.nojekyll`** — Blazor emits `_framework/`, and Jekyll strips paths starting
   with an underscore. The workflow writes `.nojekyll` to stop that.
 
-The workflow enables Pages itself via `actions/configure-pages` with
-`enablement: true`, so no manual repository setting is required.
+### One-time repository setting
+
+Pages must be turned on by hand once, under
+**Settings -> Pages -> Build and deployment -> Source: GitHub Actions**.
+
+The workflow cannot do this for you. `actions/configure-pages` has an
+`enablement` option, but creating a Pages site is not something the workflow's
+`GITHUB_TOKEN` is allowed to do (`Resource not accessible by integration`), so
+the step was removed rather than left in as a guaranteed failure. Until the
+setting is flipped, the `build` job passes and the `deploy` job fails.

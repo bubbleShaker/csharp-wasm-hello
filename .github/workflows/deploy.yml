@@ -42,11 +42,6 @@ jobs:
           cp dist/wwwroot/index.html dist/wwwroot/404.html
           touch dist/wwwroot/.nojekyll
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
